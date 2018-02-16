@@ -593,11 +593,13 @@ type PlayerStats struct {
 			} `json:"scorePerMin"`
 		} `json:"p9"`
 	} `json:"stats"`
-	LifeTimeStats []struct {
-		Key   string `json:"key"`
-		Value string `json:"value"`
-	} `json:"lifeTimeStats"`
-	RecentMatches []Match `json:"recentMatches"`
+	LifeStats     []LifeTimeStats `json:"lifeTimeStats"`
+	RecentMatches []Match         `json:"recentMatches"`
+}
+
+type LifeTimeStats struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 type Match struct {
@@ -624,6 +626,15 @@ type Match struct {
 // 2017-12-17T21:46:31.853
 // 2018-02-12T01:26:42.17
 var MatchLayout string = "2006-01-02T15:04:05"
+
+func (s *PlayerStats) GetLifeTimeStats() map[string]string {
+	m := make(map[string]string)
+	for _, v := range s.LifeStats {
+		m[v.Key] = v.Value
+	}
+
+	return m
+}
 
 func (m *Match) GetDate() time.Time {
 	t, err := time.Parse(MatchLayout, m.DateCollected)
