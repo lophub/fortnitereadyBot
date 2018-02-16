@@ -2,60 +2,49 @@ import discord
 import discordtoken
 from discord.ext import commands
 from discordtoken import token
+import threading
+
+client = discord.Client()
 
 
-bot_prefix = "!"
-bot = commands.Bot(command_prefix=bot_prefix)
-
-@bot.event
+@client.event
 async def on_ready():
-    print("Bot Online!")
+    print('Logged in as')
+    print(client.user.name)
+    print(client.user.id)
+    print('------')
 
-@bot.command(pass_context=True)
-async def ping():
-    await bot.say("Pong!")
+@client.event
+async def on_message(message):
+    if message.content.startswith('!test'):
+        counter = 0
+        tmp = await client.send_message(message.channel, 'Calculating messages...')
+        async for log in client.logs_from(message.channel, limit=100):
+            if log.author == message.author:
+                counter += 1
+
+        await client.edit_message(tmp, 'You have {} messages.'.format(counter))
+    elif message.content.startswith('!sleep'):
+        await asyncio.sleep(5)
+        await client.send_message(message.channel, 'Done sleeping')
 
 
-@bot.command(pass_context=True)
-async def stats():
-    await bot.say("Lop's better than you.")
-
-@bot.command(pass_context=True)
-async def ready():
-    await bot.say("I'm ready to play!")
-
-@bot.command(pass_context=True)
-async def kagy():
-    await bot.say("Gay.")
-
-@bot.command(pass_context=True)
-async def lop():
-    await bot.say("Beast.")
-
-@bot.command(pass_context=True)
-async def emyrk():
-    await bot.say("Gay.")
-
-@bot.command(pass_context=True)
-async def robdog364():
-    await bot.say("Gay.")
-
-@bot.command(pass_context=True)
-async def guywhodoesthatthing():
-    await bot.say("Gay.")
-
-@bot.command(pass_context=True)
-async def prelor():
-    await bot.say("Gay.")
-
-@bot.command(pass_context=True)
-async def jackal():
-    await bot.say("Gay.")
-
-@bot.command(pass_context=True)
-async def gay():
-    await bot.say("Straight.")
-
+def sideThread():
+    # Do what you want here
+    print('Worker')
+    return
  
+t = threading.Thread(target=sideThread)
+t.start()
 
-bot.run(token)
+
+client.run(token)
+
+
+
+
+# def botthread():
+#     """thread worker function"""
+#     print ('Worker')
+#     bot.run(token)
+#     return
