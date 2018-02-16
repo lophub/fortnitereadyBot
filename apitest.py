@@ -2,7 +2,6 @@ import requests
 import json
 
 
-header = {'TRN-Api-Key':'e51f2267-2f28-418f-8033-73a42b5f34c3'}
 api = requests.get('https://api.fortnitetracker.com/v1/profile/pc/LopDropFlop', headers=header)
 api = json.loads(api.text)
 #print(api)
