@@ -18,11 +18,17 @@ var conerr error = fmt.Errorf("No connection established")
 type Bot struct {
 	token      string
 	Connection *discordgo.Session
+	APIPoller  *APIPoller
+	NameList   []string
+	Parser     *Parser
 }
 
-func NewBot(token string) *Bot {
+func NewBot(token string, namelist []string) *Bot {
 	b := new(Bot)
 	b.token = token
+	b.NameList = namelist
+	b.APIPoller = NewAPIPoller(b.NameList)
+	b.Parser = NewParser()
 
 	return b
 }

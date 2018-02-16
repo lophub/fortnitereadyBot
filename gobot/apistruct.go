@@ -1,12 +1,24 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"time"
 )
+
+var _ = fmt.Println
 
 func (p *PlayerStats) String() string {
 	s, _ := json.Marshal(p)
-	return string(s)
+
+	var buf bytes.Buffer
+
+	err := json.Indent(&buf, s, "", "\t")
+	if err != nil {
+		fmt.Println(err)
+	}
+	return string(buf.Bytes())
 }
 
 type PlayerStats struct {
@@ -585,24 +597,50 @@ type PlayerStats struct {
 		Key   string `json:"key"`
 		Value string `json:"value"`
 	} `json:"lifeTimeStats"`
-	RecentMatches []struct {
-		ID              int     `json:"id"`
-		AccountID       string  `json:"accountId"`
-		Playlist        string  `json:"playlist"`
-		Kills           int     `json:"kills"`
-		MinutesPlayed   int     `json:"minutesPlayed"`
-		Top1            int     `json:"top1"`
-		Top5            int     `json:"top5"`
-		Top6            int     `json:"top6"`
-		Top10           int     `json:"top10"`
-		Top12           int     `json:"top12"`
-		Top25           int     `json:"top25"`
-		Matches         int     `json:"matches"`
-		Top3            int     `json:"top3"`
-		DateCollected   string  `json:"dateCollected"`
-		Score           int     `json:"score"`
-		Platform        int     `json:"platform"`
-		TrnRating       float64 `json:"trnRating,omitempty"`
-		TrnRatingChange float64 `json:"trnRatingChange,omitempty"`
-	} `json:"recentMatches"`
+	RecentMatches []Match `json:"recentMatches"`
+}
+
+type Match struct {
+	ID              int     `json:"id"`
+	AccountID       string  `json:"accountId"`
+	Playlist        string  `json:"playlist"`
+	Kills           int     `json:"kills"`
+	MinutesPlayed   int     `json:"minutesPlayed"`
+	Top1            int     `json:"top1"`
+	Top5            int     `json:"top5"`
+	Top6            int     `json:"top6"`
+	Top10           int     `json:"top10"`
+	Top12           int     `json:"top12"`
+	Top25           int     `json:"top25"`
+	Matches         int     `json:"matches"`
+	Top3            int     `json:"top3"`
+	DateCollected   string  `json:"dateCollected"`
+	Score           int     `json:"score"`
+	Platform        int     `json:"platform"`
+	TrnRating       float64 `json:"trnRating,omitempty"`
+	TrnRatingChange float64 `json:"trnRatingChange,omitempty"`
+}
+
+// 2017-12-17T21:46:31.853
+// 2018-02-12T01:26:42.17
+var MatchLayout string = "2006-01-02T15:04:05"
+
+func (m *Match) GetDate() time.Time {
+	t, err := time.Parse(MatchLayout, m.DateCollected)
+	if err != nil {
+		fmt.Println(err, m.DateCollected)
+	}
+	return t
+}
+
+type MatchList []Match
+
+func (s MatchList) Len() int {
+	return len(s)
+}
+func (s MatchList) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s MatchList) Less(i, j int) bool {
+	return s[i].GetDate().Before(s[j].GetDate())
 }

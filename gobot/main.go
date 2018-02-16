@@ -5,26 +5,30 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
+var _ = time.Now
+
+var Names = []string{"Emyrks", "LopDropFlop", "r0bd0g364", "GuyWhoDoesThings"}
+
 func main() {
-	// testapi()
+	startbot()
 }
 
 func testapi() {
-	// resp, err := Get("LopDropFlop")
-	// panicerror(err)
-	// fmt.Println(resp.String())
-	// fmt.Println(len(resp.RecentMatches))
+	resp, err := Get("LopDropFlop")
+	panicerror(err)
+	fmt.Println(resp.String())
+	fmt.Println(len(resp.RecentMatches))
 }
 
 func startbot() {
-	b := NewBot(token)
+	b := NewBot(token, Names)
 	err := b.Connect()
 	panicerror(err)
 
-	// time.Sleep(10 * time.Second)
-	b.Send(TestChannel, "Test")
+	go b.Run()
 
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
